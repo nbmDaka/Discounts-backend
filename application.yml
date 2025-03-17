@@ -5,16 +5,11 @@ spring:
   datasource:
     url: jdbc:postgresql://db:5432/discounts
     username: postgres
-    password: 123456
+    password: 1475963
     driver-class-name: org.postgresql.Driver
-    properties:
+    jpa:
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-
+        ddl-auto: update
 server:
   port: 3000
