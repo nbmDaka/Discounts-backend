@@ -3,15 +3,18 @@ spring:
     name: Discount-Application
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/discounts
+    url: jdbc:postgresql://db:5432/discounts
     username: postgres
     password: 123456
     driver-class-name: org.postgresql.Driver
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
 
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
 
 server:
   port: 3000
