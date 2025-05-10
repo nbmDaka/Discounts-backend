@@ -1,39 +1,70 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:16
-    container_name: discount-db
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1475963
-      POSTGRES_DB: discounts
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./pgdata:/var/lib/postgresql/data  # Store database in a shared folder
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d discounts"]
-      interval: 10s
-      retries: 5
-      start_period: 5s
-
   backend:
     build: .
     container_name: discount-backend
     ports:
       - "3000:3000"
     depends_on:
-      db:
-        condition: service_healthy  # Wait for database
+      - db
     environment:
       SPRING_APPLICATION_NAME: Discount-Application
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/discounts
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 1475963
+      SPRING_DATASOURCE_PASSWORD: 123456
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     restart: always
+
+  db:
+    image: postgres:16
+    container_name: discount-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: discounts
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: discount-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json  # Auto-connect config
+    depends_on:
+      - db
+
+  # backup:
+  #   image: postgres:16
+  #   container_name: discount-backup
+  #   restart: always
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - pgbackup:/backups
+  #   entrypoint: >
+  #     /bin/sh -c "
+  #     while true; do
+  #       pg_dump -h db -U postgres -d discounts | gzip > /backups/backup-discounts-$(date +%F-%H-%M).tar.gz;
+  #       find /backups -type f -name '*.tar.gz' -mtime +7 -exec rm {} \;
+  #       sleep 86400;
+  #     done"
+  #   environment:
+  #     PGPASSWORD: 123456
+
 volumes:
   pgdata:
+  pgadmin_data:
+  pgbackup:
