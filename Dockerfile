@@ -1,14 +1,12 @@
-# Use a lightweight OpenJDK image
-FROM openjdk:21-jdk-slim
-
-# Set working directory inside container
+# Stage 1: build the JAR
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copy the JAR file from the target directory (Ensure you've built your app first)
-COPY target/*.jar app.jar
-
-# Expose the port your Spring Boot application runs on
-EXPOSE 3000
-
-# Command to run the JAR file
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Stage 2: run the JAR
+FROM openjdk:21-jdk-slim
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]
