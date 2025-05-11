@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: Discount-Application
+
+  datasource:
+    url: jdbc:postgresql://db:5432/discounts
+    username: postgres
+    password: 123456
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    # idiomatic way to set the dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: ${SPRING_MAIL_USERNAME:your_email@gmail.com}
+    password: ${SPRING_MAIL_PASSWORD:your_email_password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: 3000
+
+jwt:
+  secret: ${JWT_SECRET:your_jwt_secret_key}
+  accessTokenExpirationMs: 900000
+  refreshTokenExpirationMs: 2592000000
