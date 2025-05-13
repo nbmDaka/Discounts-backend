@@ -1,6 +1,7 @@
 package com.discount_backend.Discount_backend.service;
 
 
+import com.discount_backend.Discount_backend.dto.AuthResponse;
 import com.discount_backend.Discount_backend.dto.SignupRequest;
 import com.discount_backend.Discount_backend.entity.*;
 import com.discount_backend.Discount_backend.exception.ResourceNotFoundException;
@@ -23,13 +24,30 @@ import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
-    @Autowired private UserRepository userRepo;
-    @Autowired private RoleRepository roleRepo;
-    @Autowired private VerificationTokenRepository tokenRepo;
-    @Autowired private PasswordEncoder pwEncoder;
-    @Autowired private JavaMailSender mailSender;
-    @Autowired private AuthenticationManager authManager;
-    @Autowired public JwtUtil jwtUtil;
+    private final UserRepository userRepo;
+    private final RoleRepository roleRepo;
+    private final VerificationTokenRepository tokenRepo;
+    private final PasswordEncoder pwEncoder;
+    private final JavaMailSender mailSender;
+    private final AuthenticationManager authManager;
+    private final JwtUtil jwtUtil;
+
+    @Autowired
+    public AuthService(UserRepository userRepo,
+                       RoleRepository roleRepo,
+                       VerificationTokenRepository tokenRepo,
+                       PasswordEncoder pwEncoder,
+                       JavaMailSender mailSender,
+                       AuthenticationManager authManager,
+                       JwtUtil jwtUtil) {
+        this.userRepo = userRepo;
+        this.roleRepo = roleRepo;
+        this.tokenRepo = tokenRepo;
+        this.pwEncoder = pwEncoder;
+        this.mailSender = mailSender;
+        this.authManager = authManager;
+        this.jwtUtil = jwtUtil;
+    }
 
     @Transactional
     public void register(SignupRequest req) {
@@ -42,7 +60,7 @@ public class AuthService {
         userRepo.save(user);
 
         // assign default ROLE_USER
-        Role role = roleRepo.findByName("ROLE_USER")
+        Role role = roleRepo.findByName("user")
                 .orElseThrow(() -> new ResourceNotFoundException("Default role not found"));
         UserRole ur = new UserRole();
         ur.setUser(user);
@@ -64,6 +82,7 @@ public class AuthService {
         mailSender.send(mail);
     }
 
+    @Transactional
     public void verifyAccount(String token) {
         VerificationToken vToken = tokenRepo.findByToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid token"));
@@ -76,7 +95,7 @@ public class AuthService {
         tokenRepo.delete(vToken);
     }
 
-    public com.discount_backend.Discount_backend.dto.AuthResponse authenticate(String username, String password) {
+    public AuthResponse authenticate(String username, String password) {
         authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         User user = userRepo.findByUsername(username).get();
         List<String> roles = user.getUserRoles().stream()
@@ -85,5 +104,22 @@ public class AuthService {
         String access = jwtUtil.generateAccessToken(username, roles);
         String refresh = jwtUtil.generateRefreshToken(username);
         return new com.discount_backend.Discount_backend.dto.AuthResponse(access, refresh, roles);
+    }
+
+    public AuthResponse refreshToken(String refreshToken) {
+        if (!jwtUtil.validateToken(refreshToken)) {
+            throw new IllegalArgumentException("Invalid refresh token");
+        }
+        String username = jwtUtil.getUsername(refreshToken);
+        // bypass authenticationManager here since we already trust the refresh token
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        List<String> roles = user.getUserRoles()
+                .stream()
+                .map(ur -> ur.getRole().getName())
+                .collect(Collectors.toList());
+        String newAccess  = jwtUtil.generateAccessToken(username, roles);
+        String newRefresh = jwtUtil.generateRefreshToken(username);
+        return new AuthResponse(newAccess, newRefresh, roles);
     }
 }

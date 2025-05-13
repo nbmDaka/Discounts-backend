@@ -4,14 +4,17 @@ package com.discount_backend.Discount_backend.controller;
 import com.discount_backend.Discount_backend.dto.*;
 import com.discount_backend.Discount_backend.service.AuthService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    @Autowired private AuthService authService;
+    private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest req) {
@@ -31,12 +34,10 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody String refreshToken) {
-        // validate & issue new tokens
-        String username = authService.jwtUtil.getUsername(refreshToken);
-        if (!authService.jwtUtil.validateToken(refreshToken)) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(authService.authenticate(username, "" /*password unused*/));
+    public ResponseEntity<AuthResponse> refresh(
+            @Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(
+                authService.refreshToken(request.getRefreshToken())
+        );
     }
 }
