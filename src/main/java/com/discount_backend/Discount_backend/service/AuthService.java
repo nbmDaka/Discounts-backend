@@ -78,7 +78,7 @@ public class AuthService {
         SimpleMailMessage mail = new SimpleMailMessage();
         mail.setTo(user.getUsername());
         mail.setSubject("Please activate your account");
-        mail.setText("Click to verify: http://localhost:8080/api/auth/verify?token=" + token);
+        mail.setText("Click to verify: http://localhost:3000/api/auth/verify?token=" + token);
         mailSender.send(mail);
     }
 

@@ -3,7 +3,9 @@ package com.discount_backend.Discount_backend.controller;
 
 import com.discount_backend.Discount_backend.dto.*;
 import com.discount_backend.Discount_backend.service.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,15 +31,51 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest req) {
-        return ResponseEntity.ok(authService.authenticate(req.getUsername(), req.getPassword()));
+    public ResponseEntity<Void> login(
+            @Valid @RequestBody LoginRequest req,
+            HttpServletResponse response
+    ) {
+        AuthResponse tokens = authService.authenticate(req.getUsername(), req.getPassword());
+
+        // Create Secure, HttpOnly cookies
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", tokens.getAccessToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(15 * 60)
+                .sameSite("Strict")
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", tokens.getRefreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(30 * 24 * 60 * 60)
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader("Set-Cookie", accessCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<AuthResponse> refresh(
-            @Valid @RequestBody RefreshTokenRequest request) {
-        return ResponseEntity.ok(
-                authService.refreshToken(request.getRefreshToken())
-        );
+    public ResponseEntity<Void> refresh(
+            @CookieValue(name = "refresh_token", required = false) String refreshToken,
+            HttpServletResponse response
+    ) {
+        AuthResponse tokens = authService.refreshToken(refreshToken);
+
+        // Overwrite cookies
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", tokens.getAccessToken())
+                .httpOnly(true).secure(true).path("/").maxAge(15 * 60).sameSite("Strict").build();
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", tokens.getRefreshToken())
+                .httpOnly(true).secure(true).path("/").maxAge(30 * 24 * 60 * 60).sameSite("Strict").build();
+
+        response.addHeader("Set-Cookie", accessCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+
+        return ResponseEntity.ok().build();
     }
 }
