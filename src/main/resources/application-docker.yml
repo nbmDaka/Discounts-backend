@@ -1,6 +1,8 @@
 spring:
+  profiles: docker
+
   application:
-    name: Discount-Application
+    name: Discount-backend
 
   datasource:
     url: jdbc:postgresql://db:5432/discounts
@@ -11,26 +13,25 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    # idiomatic way to set the dialect
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
 
   mail:
     host: smtp.gmail.com
     port: 465
-    username: ${SPRING_MAIL_USERNAME:your_email@gmail.com}
-    password: ${SPRING_MAIL_PASSWORD:your_email_password}
+    username: nurdaulet.beketov.2005@gmail.com
+    password: dniulhublxbvpbdu
     properties:
       mail:
         smtp:
           auth: true
-          starttls:
+          ssl:
             enable: true
 
 server:
   port: 3000
 
 jwt:
-  secret: ${JWT_SECRET:your_jwt_secret_key}
+  secret: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.NHVaYe26MbtOYhSKkoKYdFVomg4i8ZJd8_-RU8VNbftc4TSMb4bXP3l3YlNWACwyXPGffz5aXHc6lty1Y2t4SWRqGteragsVdZufDn5BlnJl9pdR_kdVFUsra2rWKEofkZeIC4yWytE58sMIihvo9H1ScmmVwBcQP6XETqYd0aSHp1gOa9RdUPDvoXQ5oqygTqVtxaDr6wUFKrKItgBMzWIdNZ6y7O9E0DhEPTbE9rfBo6KTFsHAZnMg4k68CDp2woYIaXbmYTWcvbzIuHO7_37GT79XdIwkm95QJ7hYC9RiwrV7mesbY4PAahERJawntho0my942XheVLmGwLMBkQ
   accessTokenExpirationMs: 900000
   refreshTokenExpirationMs: 2592000000
