@@ -13,6 +13,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,32 +55,36 @@ public class AuthService {
         if (userRepo.existsByUsername(req.getUsername())) {
             throw new UserAlreadyExistsException("Username already taken");
         }
-        User user = new User();
-        user.setUsername(req.getUsername());
-        user.setPassword(pwEncoder.encode(req.getPassword()));
-        userRepo.save(user);
+        try {
+            User user = new User();
+            user.setUsername(req.getUsername());
+            user.setPassword(pwEncoder.encode(req.getPassword()));
+            userRepo.save(user);
 
-        // assign default ROLE_USER
-        Role role = roleRepo.findByName("user")
-                .orElseThrow(() -> new ResourceNotFoundException("Default role not found"));
-        UserRole ur = new UserRole();
-        ur.setUser(user);
-        ur.setRole(role);
-        user.getUserRoles().add(ur);
+            // assign default ROLE_USER
+            Role role = roleRepo.findByName("user")
+                    .orElseThrow(() -> new ResourceNotFoundException("Default role not found"));
+            UserRole ur = new UserRole();
+            ur.setUser(user);
+            ur.setRole(role);
+            user.getUserRoles().add(ur);
 
-        // create & send verification token
-        String token = UUID.randomUUID().toString();
-        VerificationToken vToken = new VerificationToken();
-        vToken.setToken(token);
-        vToken.setUser(user);
-        vToken.setExpiryDate(Instant.now().plusSeconds(86400));
-        tokenRepo.save(vToken);
+            // create & send verification token
+            String token = UUID.randomUUID().toString();
+            VerificationToken vToken = new VerificationToken();
+            vToken.setToken(token);
+            vToken.setUser(user);
+            vToken.setExpiryDate(Instant.now().plusSeconds(86400));
+            tokenRepo.save(vToken);
 
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setTo(user.getUsername());
-        mail.setSubject("Please activate your account");
-        mail.setText("Click to verify: http://localhost:3000/api/auth/verify?token=" + token);
-        mailSender.send(mail);
+            SimpleMailMessage mail = new SimpleMailMessage();
+            mail.setTo(user.getUsername());
+            mail.setSubject("Please activate your account");
+            mail.setText("Click to verify: http://localhost:3000/api/auth/verify?token=" + token);
+            mailSender.send(mail);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during registration process");
+        }
     }
 
     @Transactional
@@ -96,8 +101,14 @@ public class AuthService {
     }
 
     public AuthResponse authenticate(String username, String password) {
-        authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        User user = userRepo.findByUsername(username).get();
+        try {
+            authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (AuthenticationException e) {
+            throw new org.springframework.security.core.AuthenticationException("Invalid username or password") {};
+        }
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
         List<String> roles = user.getUserRoles().stream()
                 .map(ur -> ur.getRole().getName())
                 .collect(Collectors.toList());
