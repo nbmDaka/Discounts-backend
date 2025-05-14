@@ -68,7 +68,7 @@ public class AuthService {
 
             // assign default ROLE_USER
             Role role = roleRepo.findByName("user")
-                    .orElseThrow(() -> new ResourceNotFoundException("Default role not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Default role not found", id));
             UserRole ur = new UserRole();
             ur.setUser(user);
             ur.setRole(role);
@@ -95,9 +95,9 @@ public class AuthService {
     @Transactional
     public void verifyAccount(String token) {
         VerificationToken vToken = tokenRepo.findByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException("Invalid token"));
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid token", id));
         if (vToken.getExpiryDate().isBefore(Instant.now())) {
-            throw new ResourceNotFoundException("Token expired");
+            throw new ResourceNotFoundException("Token expired", id);
         }
         User user = vToken.getUser();
         user.setEnabled(true);
@@ -112,7 +112,7 @@ public class AuthService {
             throw new org.springframework.security.core.AuthenticationException("Invalid username or password") {};
         }
         User user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found", id));
 
         List<String> roles = user.getUserRoles().stream()
                 .map(ur -> ur.getRole().getName())
@@ -129,7 +129,7 @@ public class AuthService {
         String username = jwtUtil.getUsername(refreshToken);
         // bypass authenticationManager here since we already trust the refresh token
         User user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found", id));
         List<String> roles = user.getUserRoles()
                 .stream()
                 .map(ur -> ur.getRole().getName())

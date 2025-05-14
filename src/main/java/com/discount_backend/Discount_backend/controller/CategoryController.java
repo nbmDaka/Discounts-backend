@@ -1,0 +1,50 @@
+package com.discount_backend.Discount_backend.controller;
+
+import com.discount_backend.Discount_backend.dto.category.CategoryDto;
+import com.discount_backend.Discount_backend.dto.category.CreateCategoryDto;
+import com.discount_backend.Discount_backend.service.CategoryService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/categories")
+public class CategoryController {
+    private final CategoryService service;
+
+    public CategoryController(CategoryService service) {
+        this.service = service;
+    }
+
+    @GetMapping
+    public List<CategoryDto> all() {
+        return service.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public CategoryDto one(@PathVariable Long id) {
+        return service.getById(id);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public CategoryDto create(@Valid @RequestBody CreateCategoryDto dto) {
+        return service.create(dto);
+    }
+
+    @PutMapping("/{id}")
+    public CategoryDto update(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateCategoryDto dto
+    ) {
+        return service.update(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
+    }
+}
