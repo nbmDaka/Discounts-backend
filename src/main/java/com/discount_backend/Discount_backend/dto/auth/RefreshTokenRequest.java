@@ -1,4 +1,4 @@
-package com.discount_backend.Discount_backend.dto;
+package com.discount_backend.Discount_backend.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 

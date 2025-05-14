@@ -1,6 +1,6 @@
-package com.discount_backend.Discount_backend.repository;
+package com.discount_backend.Discount_backend.repository.user;
 
-import com.discount_backend.Discount_backend.entity.UserProfile;
+import com.discount_backend.Discount_backend.entity.user.UserProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {

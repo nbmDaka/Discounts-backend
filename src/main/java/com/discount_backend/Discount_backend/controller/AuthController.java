@@ -1,8 +1,10 @@
 package com.discount_backend.Discount_backend.controller;
 
 
-import com.discount_backend.Discount_backend.dto.*;
-import com.discount_backend.Discount_backend.service.AuthService;
+import com.discount_backend.Discount_backend.dto.auth.AuthResponse;
+import com.discount_backend.Discount_backend.dto.auth.LoginRequest;
+import com.discount_backend.Discount_backend.dto.auth.SignupRequest;
+import com.discount_backend.Discount_backend.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseCookie;

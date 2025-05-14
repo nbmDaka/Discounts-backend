@@ -1,10 +1,10 @@
-package com.discount_backend.Discount_backend.service;
+package com.discount_backend.Discount_backend.service.user;
 
 import com.discount_backend.Discount_backend.dto.UserProfileDto;
-import com.discount_backend.Discount_backend.entity.User;
-import com.discount_backend.Discount_backend.entity.UserProfile;
-import com.discount_backend.Discount_backend.repository.UserProfileRepository;
-import com.discount_backend.Discount_backend.repository.UserRepository;
+import com.discount_backend.Discount_backend.entity.user.User;
+import com.discount_backend.Discount_backend.entity.user.UserProfile;
+import com.discount_backend.Discount_backend.repository.user.UserProfileRepository;
+import com.discount_backend.Discount_backend.repository.user.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 

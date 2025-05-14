@@ -1,4 +1,4 @@
-package com.discount_backend.Discount_backend.entity;
+package com.discount_backend.Discount_backend.entity.role;
 
 import jakarta.persistence.*;
 

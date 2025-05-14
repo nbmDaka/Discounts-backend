@@ -1,6 +1,7 @@
-package com.discount_backend.Discount_backend.entity;
+package com.discount_backend.Discount_backend.entity.auth;
 
 
+import com.discount_backend.Discount_backend.entity.user.User;
 import jakarta.persistence.*;
 import java.time.Instant;
 

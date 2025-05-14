@@ -1,9 +1,7 @@
-package com.discount_backend.Discount_backend.entity;
+package com.discount_backend.Discount_backend.entity.user;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;

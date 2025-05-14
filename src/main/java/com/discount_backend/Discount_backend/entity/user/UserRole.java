@@ -1,6 +1,7 @@
-package com.discount_backend.Discount_backend.entity;
+package com.discount_backend.Discount_backend.entity.user;
 
 
+import com.discount_backend.Discount_backend.entity.role.Role;
 import jakarta.persistence.*;
 
 @Entity
