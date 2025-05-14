@@ -1,12 +1,17 @@
-package com.discount_backend.Discount_backend.service;
+package com.discount_backend.Discount_backend.service.auth;
 
 
-import com.discount_backend.Discount_backend.dto.AuthResponse;
-import com.discount_backend.Discount_backend.dto.SignupRequest;
-import com.discount_backend.Discount_backend.entity.*;
+import com.discount_backend.Discount_backend.dto.auth.AuthResponse;
+import com.discount_backend.Discount_backend.dto.auth.SignupRequest;
+import com.discount_backend.Discount_backend.entity.auth.VerificationToken;
+import com.discount_backend.Discount_backend.entity.role.Role;
+import com.discount_backend.Discount_backend.entity.user.User;
+import com.discount_backend.Discount_backend.entity.user.UserRole;
 import com.discount_backend.Discount_backend.exception.ResourceNotFoundException;
 import com.discount_backend.Discount_backend.exception.UserAlreadyExistsException;
-import com.discount_backend.Discount_backend.repository.*;
+import com.discount_backend.Discount_backend.repository.user.UserRepository;
+import com.discount_backend.Discount_backend.repository.auth.VerificationTokenRepository;
+import com.discount_backend.Discount_backend.repository.role.RoleRepository;
 import com.discount_backend.Discount_backend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -114,7 +119,7 @@ public class AuthService {
                 .collect(Collectors.toList());
         String access = jwtUtil.generateAccessToken(username, roles);
         String refresh = jwtUtil.generateRefreshToken(username);
-        return new com.discount_backend.Discount_backend.dto.AuthResponse(access, refresh, roles);
+        return new AuthResponse(access, refresh, roles);
     }
 
     public AuthResponse refreshToken(String refreshToken) {

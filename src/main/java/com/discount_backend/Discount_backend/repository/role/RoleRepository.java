@@ -1,7 +1,7 @@
-package com.discount_backend.Discount_backend.repository;
+package com.discount_backend.Discount_backend.repository.role;
 
 
-import com.discount_backend.Discount_backend.entity.Role;
+import com.discount_backend.Discount_backend.entity.role.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

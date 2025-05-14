@@ -1,7 +1,7 @@
 package com.discount_backend.Discount_backend.controller;
 
 import com.discount_backend.Discount_backend.dto.UserProfileDto;
-import com.discount_backend.Discount_backend.service.UserProfileService;
+import com.discount_backend.Discount_backend.service.user.UserProfileService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;

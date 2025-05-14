@@ -1,7 +1,7 @@
-package com.discount_backend.Discount_backend.repository;
+package com.discount_backend.Discount_backend.repository.user;
 
 
-import com.discount_backend.Discount_backend.entity.User;
+import com.discount_backend.Discount_backend.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

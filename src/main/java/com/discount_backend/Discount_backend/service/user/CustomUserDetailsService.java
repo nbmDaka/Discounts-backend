@@ -1,8 +1,8 @@
-package com.discount_backend.Discount_backend.service;
+package com.discount_backend.Discount_backend.service.user;
 
 
-import com.discount_backend.Discount_backend.entity.User;
-import com.discount_backend.Discount_backend.repository.UserRepository;
+import com.discount_backend.Discount_backend.entity.user.User;
+import com.discount_backend.Discount_backend.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
