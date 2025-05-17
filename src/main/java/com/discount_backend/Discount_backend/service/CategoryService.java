@@ -3,7 +3,7 @@ package com.discount_backend.Discount_backend.service;
 import com.discount_backend.Discount_backend.dto.category.CategoryDto;
 import com.discount_backend.Discount_backend.dto.category.CategoryMapper;
 import com.discount_backend.Discount_backend.dto.category.CreateCategoryDto;
-import com.discount_backend.Discount_backend.entity.Category;
+import com.discount_backend.Discount_backend.entity.category.Category;
 import com.discount_backend.Discount_backend.exception.ResourceNotFoundException;
 import com.discount_backend.Discount_backend.repository.categoryRepository.CategoryRepository;
 import jakarta.transaction.Transactional;
@@ -38,11 +38,21 @@ public class CategoryService {
         return CategoryMapper.toDto(saved);
     }
 
+    @Transactional
     public CategoryDto update(Long id, CreateCategoryDto dto) {
         Category existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", id));
-        existing.setName(dto.getName());
-        existing.setDescription(dto.getDescription());
+
+        if (dto.getName() != null) {
+            existing.setName(dto.getName());
+        }
+        if (dto.getDescription() != null) {
+            existing.setDescription(dto.getDescription());
+        }
+        if (dto.getImageUrl() != null) {
+            existing.setImageUrl(dto.getImageUrl());
+        }
+
         return CategoryMapper.toDto(repo.save(existing));
     }
 

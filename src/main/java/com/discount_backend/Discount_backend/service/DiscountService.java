@@ -1,11 +1,10 @@
 package com.discount_backend.Discount_backend.service;
 
-import com.discount_backend.Discount_backend.dto.*;
 import com.discount_backend.Discount_backend.dto.discount.CreateDiscountDto;
 import com.discount_backend.Discount_backend.dto.discount.DiscountDto;
 import com.discount_backend.Discount_backend.dto.discount.DiscountMapper;
 import com.discount_backend.Discount_backend.entity.*;
-import com.discount_backend.Discount_backend.entity.Category;
+import com.discount_backend.Discount_backend.entity.category.Category;
 import com.discount_backend.Discount_backend.entity.discount.Discount;
 import com.discount_backend.Discount_backend.exception.ResourceNotFoundException;
 import com.discount_backend.Discount_backend.repository.categoryRepository.CategoryRepository;

@@ -34,10 +34,10 @@ public class CategoryController {
         return service.create(dto);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public CategoryDto update(
             @PathVariable Long id,
-            @Valid @RequestBody CreateCategoryDto dto
+            @RequestBody CreateCategoryDto dto
     ) {
         return service.update(id, dto);
     }

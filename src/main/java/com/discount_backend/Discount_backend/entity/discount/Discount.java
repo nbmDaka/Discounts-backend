@@ -1,6 +1,6 @@
 package com.discount_backend.Discount_backend.entity.discount;
 
-import com.discount_backend.Discount_backend.entity.Category;
+import com.discount_backend.Discount_backend.entity.category.Category;
 import com.discount_backend.Discount_backend.entity.Market;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ public class Discount {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
-    private com.discount_backend.Discount_backend.entity.Category category;
+    private Category category;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)

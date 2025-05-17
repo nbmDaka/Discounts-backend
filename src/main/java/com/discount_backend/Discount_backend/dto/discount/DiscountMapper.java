@@ -1,6 +1,6 @@
 package com.discount_backend.Discount_backend.dto.discount;
 
-import com.discount_backend.Discount_backend.entity.Category;
+import com.discount_backend.Discount_backend.entity.category.Category;
 import com.discount_backend.Discount_backend.entity.Market;
 import com.discount_backend.Discount_backend.entity.discount.Discount;
 
