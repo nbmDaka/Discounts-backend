@@ -18,7 +18,7 @@ public class DiscountMapper {
         dto.setDiscountedPrice(d.getDiscountedPrice());
         dto.setStartDate(d.getStartDate());
         dto.setEndDate(d.getEndDate());
-        dto.setPremium(d.getPremium());
+        dto.setIsPremium(d.getIsPremium());
         return dto;
     }
 
