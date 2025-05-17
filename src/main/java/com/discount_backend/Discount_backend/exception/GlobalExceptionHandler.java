@@ -1,13 +1,13 @@
 package com.discount_backend.Discount_backend.exception;
 
-import org.springframework.http.HttpHeaders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @RequestMapping(produces = "application/json")
 public class GlobalExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // 400 Bad Request: validation failures
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -125,6 +126,9 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest req
     ) {
+
+        log.error("Unexpected error at [{}]: {}", req.getRequestURI(), ex.getMessage(), ex);
+
         var body = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),

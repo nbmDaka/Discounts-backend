@@ -5,6 +5,7 @@ import com.discount_backend.Discount_backend.entity.user.User;
 import com.discount_backend.Discount_backend.entity.user.UserProfile;
 import com.discount_backend.Discount_backend.repository.user.UserProfileRepository;
 import com.discount_backend.Discount_backend.repository.user.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -32,32 +33,49 @@ public class UserProfileService {
         return toDto(profile);
     }
 
+
+    @Transactional
     public UserProfileDto updateMyProfile(String username, UserProfileDto dto) {
         User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         UserProfile profile = Optional.ofNullable(user.getProfile())
                 .orElseGet(() -> {
                     UserProfile p = new UserProfile();
                     p.setUser(user);
                     return p;
                 });
-        // apply changes from dto
-        profile.setFirstName(dto.getFirstName());
-        profile.setLastName(dto.getLastName());
-        profile.setEmail(dto.getEmail());
-        profile.setPhoneNumber(dto.getPhoneNumber());
-        profile.setAvatarUrl(dto.getAvatarUrl());
+
+        // **Only overwrite when the DTO property is non-null**
+        if (dto.getFirstName() != null) {
+            profile.setFirstName(dto.getFirstName());
+        }
+        if (dto.getLastName() != null) {
+            profile.setLastName(dto.getLastName());
+        }
+        if (dto.getEmail() != null) {
+            profile.setEmail(dto.getEmail());
+        }
+        if (dto.getPhoneNumber() != null) {
+            profile.setPhoneNumber(dto.getPhoneNumber());
+        }
+        if (dto.getAvatarUrl() != null) {
+            profile.setAvatarUrl(dto.getAvatarUrl());
+        }
+
+        // persist (cascade to user if needed)
         profileRepo.save(profile);
+
         return toDto(profile);
     }
 
     private UserProfileDto toDto(UserProfile p) {
-        UserProfileDto d = new UserProfileDto();
-        d.setFirstName(p.getFirstName());
-        d.setLastName(p.getLastName());
-        d.setEmail(p.getEmail());
-        d.setPhoneNumber(p.getPhoneNumber());
-        d.setAvatarUrl(p.getAvatarUrl());
-        return d;
+        UserProfileDto out = new UserProfileDto();
+        out.setFirstName(p.getFirstName());
+        out.setLastName(p.getLastName());
+        out.setEmail(p.getEmail());
+        out.setPhoneNumber(p.getPhoneNumber());
+        out.setAvatarUrl(p.getAvatarUrl());
+        return out;
     }
 }

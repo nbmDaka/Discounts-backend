@@ -3,8 +3,13 @@ package com.discount_backend.Discount_backend.entity.auth;
 
 import com.discount_backend.Discount_backend.entity.user.User;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.Instant;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "verification_tokens")
 public class VerificationToken {
@@ -21,36 +26,5 @@ public class VerificationToken {
     @Column(nullable = false)
     private Instant expiryDate;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Instant getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(Instant expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-// getters & setters
+    // getters & setters
 }

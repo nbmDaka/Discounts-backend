@@ -6,6 +6,7 @@ import com.discount_backend.Discount_backend.dto.auth.SignupRequest;
 import com.discount_backend.Discount_backend.entity.auth.VerificationToken;
 import com.discount_backend.Discount_backend.entity.role.Role;
 import com.discount_backend.Discount_backend.entity.user.User;
+import com.discount_backend.Discount_backend.entity.user.UserProfile;
 import com.discount_backend.Discount_backend.entity.user.UserRole;
 import com.discount_backend.Discount_backend.exception.ResourceNotFoundException;
 import com.discount_backend.Discount_backend.exception.UserAlreadyExistsException;
@@ -66,6 +67,11 @@ public class AuthService {
             User user = new User();
             user.setUsername(req.getUsername());
             user.setPassword(pwEncoder.encode(req.getPassword()));
+
+            UserProfile profile = user.getProfile();
+            profile.setFirstName(req.getFirstName());
+            profile.setLastName(req.getLastName());
+            user.getProfile().setEmail(req.getUsername());
             userRepo.save(user);
 
             // assign default ROLE_USER
