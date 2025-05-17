@@ -42,13 +42,29 @@ public class MarketService {
         Market existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Market", id));
 
-        existing.setName(dto.getName());
-        existing.setAddress(dto.getAddress());
-        existing.setLatitude(dto.getLatitude());
-        existing.setLongitude(dto.getLongitude());
-        existing.setPhone(dto.getPhone());
-        existing.setWebsiteUrl(dto.getWebsiteUrl());
-        existing.setLogoUrl(dto.getLogoUrl());
+
+        if (dto.getName() != null) {
+            existing.setName(dto.getName());
+        }
+        if (dto.getAddress() != null) {
+            existing.setAddress(dto.getAddress());
+        }
+        if (dto.getLatitude() != null) {
+            existing.setLatitude(dto.getLatitude());
+        }
+        if (dto.getLongitude() != null) {
+            existing.setLongitude(dto.getLongitude());
+        }
+        if (dto.getPhone() != null) {
+            existing.setPhone(dto.getPhone());
+        }
+        if (dto.getWebsiteUrl() != null) {
+            existing.setWebsiteUrl(dto.getWebsiteUrl());
+        }
+        if (dto.getImageUrl() != null) {
+            existing.setImageUrl(dto.getImageUrl());
+        }
+
 
         Market updated = repo.save(existing);
         return MarketMapper.toDto(updated);

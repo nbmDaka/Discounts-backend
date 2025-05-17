@@ -34,10 +34,10 @@ public class MarketController {
         return service.create(dto);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public MarketDto update(
             @PathVariable Long id,
-            @Valid @RequestBody CreateMarketDto dto
+            @RequestBody CreateMarketDto dto
     ) {
         return service.update(id, dto);
     }

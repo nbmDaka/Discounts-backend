@@ -13,7 +13,7 @@ public class MarketMapper {
         dto.setLongitude(m.getLongitude());
         dto.setPhone(m.getPhone());
         dto.setWebsiteUrl(m.getWebsiteUrl());
-        dto.setLogoUrl(m.getLogoUrl());
+        dto.setImageUrl(m.getImageUrl());
         dto.setCreatedAt(m.getCreatedAt());
         dto.setUpdatedAt(m.getUpdatedAt());
         return dto;
@@ -27,7 +27,7 @@ public class MarketMapper {
         m.setLongitude(dto.getLongitude());
         m.setPhone(dto.getPhone());
         m.setWebsiteUrl(dto.getWebsiteUrl());
-        m.setLogoUrl(dto.getLogoUrl());
+        m.setImageUrl(dto.getImageUrl());
         return m;
     }
 }
