@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@RequestMapping(produces = "application/json")
 public class GlobalExceptionHandler {
 
     // 400 Bad Request: validation failures

@@ -80,4 +80,31 @@ public class AuthController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+        // Clear access_token cookie
+        ResponseCookie clearAccessCookie = ResponseCookie.from("access_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0) // Immediately expire
+                .sameSite("Strict")
+                .build();
+
+        // Clear refresh_token cookie
+        ResponseCookie clearRefreshCookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader("Set-Cookie", clearAccessCookie.toString());
+        response.addHeader("Set-Cookie", clearRefreshCookie.toString());
+
+        return ResponseEntity.ok().build();
+    }
+
 }
