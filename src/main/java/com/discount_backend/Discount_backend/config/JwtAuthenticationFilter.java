@@ -20,16 +20,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired private JwtUtil jwtUtil;
     @Autowired private CustomUserDetailsService userDetailsService;
 
+    @Override
     protected void doFilterInternal(HttpServletRequest req,
                                     HttpServletResponse res,
                                     FilterChain chain)
             throws java.io.IOException, jakarta.servlet.ServletException {
+
+        String path = req.getRequestURI();
+
+        // ✅ Skip Swagger and OpenAPI paths
+        if (path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui") || path.equals("/swagger-ui.html")) {
+            chain.doFilter(req, res);
+            return;
+        }
 
         String token = null;
         if (req.getCookies() != null) {
             for (Cookie cookie : req.getCookies()) {
                 if ("access_token".equals(cookie.getName())) {
                     token = cookie.getValue();
+                    break;
                 }
             }
         }
@@ -46,4 +56,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         chain.doFilter(req, res);
     }
+
 }
