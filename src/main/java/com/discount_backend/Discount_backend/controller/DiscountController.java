@@ -18,11 +18,11 @@ import java.util.Optional;
 @RequestMapping("/api/discounts")
 public class DiscountController {
     private final DiscountService service;
-    private final BaseUploadController uploadController;
+    private final FileController fileController;
 
     public DiscountController(DiscountService service, ImageService imageService) {
         this.service = service;
-        this.uploadController = new BaseUploadController(imageService);
+        this.fileController = new FileController(imageService);
     }
 
     @GetMapping
@@ -61,6 +61,13 @@ public class DiscountController {
     @PostMapping("/{discountId}/image")
     public ResponseEntity<String> uploadDiscountImage(@PathVariable Long discountId,
                                                       @RequestParam MultipartFile file) {
-        return uploadController.handleUpload(discountId, ObjectType.DISCOUNT, file);
+        return fileController.handleUpload(discountId, ObjectType.DISCOUNT, file);
+    }
+
+    @DeleteMapping("/{discountId}/image")
+    public ResponseEntity<Void> disableDiscountImage(
+            @PathVariable Long discountId) {
+        fileController.handleDisableImage(discountId, ObjectType.DISCOUNT);
+        return ResponseEntity.noContent().build();
     }
 }

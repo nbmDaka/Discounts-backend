@@ -15,11 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/users/me")
 public class UserProfileController {
     private final UserProfileService service;
-    private final BaseUploadController uploadController;
+    private final FileController fileController;
 
     public UserProfileController(UserProfileService service, ImageService imageService) {
         this.service = service;
-        this.uploadController = new BaseUploadController(imageService);
+        this.fileController = new FileController(imageService);
     }
 
     @GetMapping
@@ -38,7 +38,14 @@ public class UserProfileController {
     @PostMapping("/{userId}/image")
     public ResponseEntity<String> uploadUserImage(@PathVariable Long userId,
                                                   @RequestParam MultipartFile file) {
-        return uploadController.handleUpload(userId, ObjectType.USER, file);
+        return fileController.handleUpload(userId, ObjectType.USER, file);
+    }
+
+    @DeleteMapping("/{userId}/image")
+    public ResponseEntity<Void> disableDiscountImage(
+            @PathVariable Long userId) {
+        fileController.handleDisableImage(userId, ObjectType.USER);
+        return ResponseEntity.noContent().build();
     }
 
 }

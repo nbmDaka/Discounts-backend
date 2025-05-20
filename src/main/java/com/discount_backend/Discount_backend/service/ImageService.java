@@ -4,11 +4,14 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.discount_backend.Discount_backend.entity.objectfiles.ObjectFile;
 import com.discount_backend.Discount_backend.entity.objectfiles.ObjectType;
+import com.discount_backend.Discount_backend.exception.ResourceNotFoundException;
 import com.discount_backend.Discount_backend.repository.objectRepository.ObjectFileRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Map;
 
 @Service
@@ -33,5 +36,15 @@ public class ImageService {
         fileRepo.save(metadata);
 
         return url;
+    }
+
+    public void disableImageByObject(Long objectId, ObjectType type) {
+        ObjectFile file = fileRepo
+                .findFirstByObjectTypeIdAndObjectIdAndIsPrimaryTrueAndActiveTrue(
+                        type.getId(), objectId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "No active image for " + type + " id=" + objectId));
+        file.setActive(false);
+        fileRepo.save(file);
     }
 }

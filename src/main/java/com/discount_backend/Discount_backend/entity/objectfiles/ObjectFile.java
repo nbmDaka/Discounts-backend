@@ -26,6 +26,10 @@ public class ObjectFile {
     @Column(name = "is_primary", nullable = false)
     private boolean isPrimary = true;
 
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
+
     @Column(name = "created_at", updatable = false)
     private Instant createdAt = Instant.now();
+
 }

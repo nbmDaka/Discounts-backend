@@ -15,5 +15,6 @@ CREATE TABLE object_file (
                              object_id BIGINT NOT NULL,
                              image_url TEXT NOT NULL,
                              is_primary BOOLEAN NOT NULL DEFAULT TRUE,
+                             is_active BOOLEAN NOT NULL DEFAULT TRUE,
                              created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );

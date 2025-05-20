@@ -5,10 +5,7 @@ import com.discount_backend.Discount_backend.dto.category.CreateCategoryDto;
 import com.discount_backend.Discount_backend.entity.objectfiles.ObjectType;
 import com.discount_backend.Discount_backend.service.CategoryService;
 import com.discount_backend.Discount_backend.service.ImageService;
-import com.discount_backend.Discount_backend.controller.BaseUploadController;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +17,11 @@ import java.util.List;
 @RequestMapping("/api/categories")
 public class CategoryController {
     private final CategoryService service;
-    private final BaseUploadController uploadController;
+    private final FileController fileController;
 
     public CategoryController(CategoryService categoryService, ImageService imageService) {
         this.service = categoryService;
-        this.uploadController = new BaseUploadController(imageService);
+        this.fileController = new FileController(imageService);
     }
 
     @GetMapping
@@ -61,11 +58,13 @@ public class CategoryController {
     public ResponseEntity<String> uploadCategoryImage(
             @PathVariable Long categoryId,
             @RequestParam MultipartFile file) {
-            if (file == null || file.isEmpty()) {
-                return ResponseEntity
-                        .badRequest()
-                        .body("File must not be empty");
-            }
-        return uploadController.handleUpload(categoryId, ObjectType.CATEGORY, file);
+        return fileController.handleUpload(categoryId, ObjectType.CATEGORY, file);
+    }
+
+    @DeleteMapping("/{categoryId}/image")
+    public ResponseEntity<Void> disableCategoryImage(
+            @PathVariable Long categoryId) {
+        fileController.handleDisableImage(categoryId, ObjectType.CATEGORY);
+        return ResponseEntity.noContent().build();
     }
 }

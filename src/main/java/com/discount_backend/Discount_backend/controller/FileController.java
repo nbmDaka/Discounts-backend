@@ -1,6 +1,7 @@
 package com.discount_backend.Discount_backend.controller;
 
 import com.discount_backend.Discount_backend.entity.objectfiles.ObjectType;
+import com.discount_backend.Discount_backend.exception.ResourceNotFoundException;
 import com.discount_backend.Discount_backend.service.ImageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,10 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 // BaseUploadController.java
-public class BaseUploadController {
+public class FileController {
     protected final ImageService imageService;
 
-    public BaseUploadController(ImageService imageService) {
+    public FileController(ImageService imageService) {
         this.imageService = imageService;
     }
 
@@ -30,6 +31,22 @@ public class BaseUploadController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Invalid request: " + e.getMessage());
+        }
+    }
+
+    protected ResponseEntity<String> handleDisableImage(Long categoryId, ObjectType type) {
+        try {
+            imageService.disableImageByObject(categoryId, type);
+            return ResponseEntity.ok("Image disabled successfully");
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Image not found: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to disable image: " + e.getMessage());
         }
     }
 }
