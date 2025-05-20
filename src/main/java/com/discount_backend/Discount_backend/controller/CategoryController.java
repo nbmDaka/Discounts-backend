@@ -60,7 +60,12 @@ public class CategoryController {
     @PostMapping("/{categoryId}/image")
     public ResponseEntity<String> uploadCategoryImage(
             @PathVariable Long categoryId,
-            @RequestParam @NotNull @NotEmpty MultipartFile file) {
+            @RequestParam MultipartFile file) {
+            if (file == null || file.isEmpty()) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("File must not be empty");
+            }
         return uploadController.handleUpload(categoryId, ObjectType.CATEGORY, file);
     }
 }

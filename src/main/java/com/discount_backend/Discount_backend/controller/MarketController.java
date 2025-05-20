@@ -58,7 +58,7 @@ public class MarketController {
 
     @PostMapping("/{marketId}/image")
     public ResponseEntity<String> uploadMarketImage(@PathVariable Long marketId,
-                                                    @RequestParam @NotNull @NotEmpty MultipartFile file) {
+                                                    @RequestParam MultipartFile file) {
         return uploadController.handleUpload(marketId, ObjectType.MARKET, file);
     }
 
