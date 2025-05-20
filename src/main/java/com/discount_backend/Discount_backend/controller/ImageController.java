@@ -1,6 +1,6 @@
 package com.discount_backend.Discount_backend.controller;
 
-import com.discount_backend.Discount_backend.service.ImageUploadService;
+import com.discount_backend.Discount_backend.service.ImageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,9 +13,9 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/images")
 public class ImageController {
-    private final ImageUploadService imageService;
+    private final ImageService imageService;
 
-    public ImageController(ImageUploadService imageService) {
+    public ImageController(ImageService imageService) {
         this.imageService = imageService;
     }
 

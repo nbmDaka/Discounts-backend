@@ -2,10 +2,16 @@
 package com.discount_backend.Discount_backend.controller;
 
 import com.discount_backend.Discount_backend.dto.market.*;
+import com.discount_backend.Discount_backend.entity.objectfiles.ObjectType;
+import com.discount_backend.Discount_backend.service.ImageService;
 import com.discount_backend.Discount_backend.service.MarketService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -13,9 +19,11 @@ import java.util.List;
 @RequestMapping("/api/markets")
 public class MarketController {
     private final MarketService service;
+    private final BaseUploadController uploadController;
 
-    public MarketController(MarketService service) {
+    public MarketController(MarketService service, ImageService imageService) {
         this.service = service;
+        this.uploadController = new BaseUploadController(imageService);
     }
 
     @GetMapping
@@ -47,4 +55,12 @@ public class MarketController {
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
+
+    @PostMapping("/{marketId}/image")
+    public ResponseEntity<String> uploadMarketImage(@PathVariable Long marketId,
+                                                    @RequestParam @NotNull @NotEmpty MultipartFile file) {
+        return uploadController.handleUpload(marketId, ObjectType.MARKET, file);
+    }
+
+
 }

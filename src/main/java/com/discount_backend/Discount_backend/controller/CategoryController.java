@@ -2,10 +2,17 @@ package com.discount_backend.Discount_backend.controller;
 
 import com.discount_backend.Discount_backend.dto.category.CategoryDto;
 import com.discount_backend.Discount_backend.dto.category.CreateCategoryDto;
+import com.discount_backend.Discount_backend.entity.objectfiles.ObjectType;
 import com.discount_backend.Discount_backend.service.CategoryService;
+import com.discount_backend.Discount_backend.service.ImageService;
+import com.discount_backend.Discount_backend.controller.BaseUploadController;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -13,9 +20,11 @@ import java.util.List;
 @RequestMapping("/api/categories")
 public class CategoryController {
     private final CategoryService service;
+    private final BaseUploadController uploadController;
 
-    public CategoryController(CategoryService service) {
-        this.service = service;
+    public CategoryController(CategoryService categoryService, ImageService imageService) {
+        this.service = categoryService;
+        this.uploadController = new BaseUploadController(imageService);
     }
 
     @GetMapping
@@ -46,5 +55,12 @@ public class CategoryController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    @PostMapping("/{categoryId}/image")
+    public ResponseEntity<String> uploadCategoryImage(
+            @PathVariable Long categoryId,
+            @RequestParam @NotNull @NotEmpty MultipartFile file) {
+        return uploadController.handleUpload(categoryId, ObjectType.CATEGORY, file);
     }
 }
