@@ -34,18 +34,18 @@ public class FileController {
         }
     }
 
-    protected ResponseEntity<String> handleDisableImage(Long categoryId, ObjectType type) {
+    protected void handleDisableImage(Long categoryId, ObjectType type) {
         try {
             imageService.disableImageByObject(categoryId, type);
-            return ResponseEntity.ok("Image disabled successfully");
+            ResponseEntity.ok("Image disabled successfully");
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Image not found: " + e.getMessage());
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
+            ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to disable image: " + e.getMessage());
         }
     }
