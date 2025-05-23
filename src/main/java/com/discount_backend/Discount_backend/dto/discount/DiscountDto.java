@@ -22,6 +22,7 @@ public class DiscountDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean isPremium;
+    private String  imageUrl;
     // getters & setters
 
 }

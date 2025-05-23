@@ -6,6 +6,7 @@ import com.discount_backend.Discount_backend.dto.discount.DiscountMapper;
 import com.discount_backend.Discount_backend.entity.*;
 import com.discount_backend.Discount_backend.entity.category.Category;
 import com.discount_backend.Discount_backend.entity.discount.Discount;
+import com.discount_backend.Discount_backend.entity.objectfiles.ObjectType;
 import com.discount_backend.Discount_backend.exception.ResourceNotFoundException;
 import com.discount_backend.Discount_backend.repository.categoryRepository.CategoryRepository;
 import com.discount_backend.Discount_backend.repository.discountRepository.DiscountRepository;
@@ -23,15 +24,18 @@ public class DiscountService {
     private final DiscountRepository repo;
     private final MarketRepository marketRepo;
     private final CategoryRepository categoryRepo;
+    private final ImageService imageService;
 
     public DiscountService(
             DiscountRepository repo,
             MarketRepository marketRepo,
-            CategoryRepository categoryRepo
+            CategoryRepository categoryRepo,
+            ImageService imageService
     ) {
         this.repo = repo;
         this.marketRepo = marketRepo;
         this.categoryRepo = categoryRepo;
+        this.imageService = imageService;
     }
 
     public List<DiscountDto> getAll(
@@ -50,16 +54,26 @@ public class DiscountService {
         }
 
         return repo.findAll(spec).stream()
-                .map(DiscountMapper::toDto)
+                .map(discount -> {
+                    DiscountDto dto = DiscountMapper.toDto(discount);
+                    dto.setImageUrl(
+                            imageService.getActiveImageUrl(ObjectType.DISCOUNT, discount.getId())
+                    );
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
     public DiscountDto getById(Long id) {
         Discount d = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Discount", id));
-        return DiscountMapper.toDto(d);
-    }
 
+        DiscountDto dto = DiscountMapper.toDto(d);
+        dto.setImageUrl(
+                imageService.getActiveImageUrl(ObjectType.DISCOUNT, id)
+        );
+        return dto;
+    }
     public DiscountDto create(CreateDiscountDto dto) {
         Market market = marketRepo.findById(dto.getMarketId())
                 .orElseThrow(() -> new ResourceNotFoundException("Market", dto.getMarketId()));

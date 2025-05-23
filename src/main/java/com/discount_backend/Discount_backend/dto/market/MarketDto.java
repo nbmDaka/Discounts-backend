@@ -16,9 +16,9 @@ public class MarketDto {
     private BigDecimal longitude;
     private String phone;
     private String websiteUrl;
-    private String imageUrl;
     private Instant createdAt;
     private Instant updatedAt;
+    private String  imageUrl;
     // getters & setters
 
 
