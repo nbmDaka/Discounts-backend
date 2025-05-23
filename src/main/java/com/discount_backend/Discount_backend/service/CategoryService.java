@@ -4,6 +4,7 @@ import com.discount_backend.Discount_backend.dto.category.CategoryDto;
 import com.discount_backend.Discount_backend.dto.category.CategoryMapper;
 import com.discount_backend.Discount_backend.dto.category.CreateCategoryDto;
 import com.discount_backend.Discount_backend.entity.category.Category;
+import com.discount_backend.Discount_backend.entity.objectfiles.ObjectType;
 import com.discount_backend.Discount_backend.exception.ResourceNotFoundException;
 import com.discount_backend.Discount_backend.repository.categoryRepository.CategoryRepository;
 import jakarta.transaction.Transactional;
@@ -16,21 +17,33 @@ import java.util.stream.Collectors;
 @Transactional
 public class CategoryService {
     private final CategoryRepository repo;
+    private final ImageService imageService;
 
-    public CategoryService(CategoryRepository repo) {
+    public CategoryService(CategoryRepository repo, ImageService imageService) {
         this.repo = repo;
+        this.imageService = imageService;
     }
 
     public List<CategoryDto> getAll() {
         return repo.findAll().stream()
-                .map(CategoryMapper::toDto)
+                .map(cat -> {
+                    CategoryDto dto = CategoryMapper.toDto(cat);
+
+                    String url = imageService.getActiveImageUrl(ObjectType.CATEGORY, cat.getId());
+                    dto.setImageUrl(url);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
     public CategoryDto getById(Long id) {
-        return repo.findById(id)
-                .map(CategoryMapper::toDto)
+        Category cat = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", id));
+
+        CategoryDto dto = CategoryMapper.toDto(cat);
+        String url = imageService.getActiveImageUrl(ObjectType.CATEGORY, id);
+        dto.setImageUrl(url);
+        return dto;
     }
 
     public CategoryDto create(CreateCategoryDto dto) {

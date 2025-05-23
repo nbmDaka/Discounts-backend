@@ -9,6 +9,7 @@ import com.discount_backend.Discount_backend.repository.objectRepository.ObjectF
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -46,5 +47,14 @@ public class ImageService {
                         "No active image for " + type + " id=" + objectId));
         file.setActive(false);
         fileRepo.save(file);
+    }
+
+    public String getActiveImageUrl(ObjectType type, Long referenceId) {
+        return fileRepo
+                .findFirstByObjectTypeIdAndObjectIdAndIsPrimaryTrueAndActiveTrue(
+                        type.getId(), referenceId
+                )
+                .map(ObjectFile::getImageUrl)    // <-- return the stored Cloudinary URL
+                .orElse(null);
     }
 }
