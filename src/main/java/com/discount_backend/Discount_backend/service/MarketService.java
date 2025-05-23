@@ -3,6 +3,7 @@ package com.discount_backend.Discount_backend.service;
 
 import com.discount_backend.Discount_backend.dto.market.*;
 import com.discount_backend.Discount_backend.entity.Market;
+import com.discount_backend.Discount_backend.entity.objectfiles.ObjectType;
 import com.discount_backend.Discount_backend.exception.ResourceNotFoundException;
 import com.discount_backend.Discount_backend.repository.marketRepository.MarketRepository;
 import org.springframework.stereotype.Service;
@@ -17,21 +18,34 @@ import static org.apache.tomcat.jni.SSLConf.apply;
 @Transactional
 public class MarketService {
     private final MarketRepository repo;
+    private final ImageService imageService;
 
-    public MarketService(MarketRepository repo) {
+    public MarketService(MarketRepository repo, ImageService imageService) {
         this.repo = repo;
+        this.imageService = imageService;
     }
 
     public List<MarketDto> getAll() {
         return repo.findAll().stream()
-                .map(MarketMapper::toDto)
+                .map(market -> {
+                    MarketDto dto = MarketMapper.toDto(market);
+                    dto.setImageUrl(
+                            imageService.getActiveImageUrl(ObjectType.MARKET, market.getId())
+                    );
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
     public MarketDto getById(Long id) {
-        return repo.findById(id)
-                .map(MarketMapper::toDto)
+        Market m = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Market", id));
+
+        MarketDto dto = MarketMapper.toDto(m);
+        dto.setImageUrl(
+                imageService.getActiveImageUrl(ObjectType.MARKET, id)
+        );
+        return dto;
     }
 
     public MarketDto create(CreateMarketDto dto) {
