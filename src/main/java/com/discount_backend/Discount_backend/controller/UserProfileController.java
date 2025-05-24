@@ -1,6 +1,6 @@
 package com.discount_backend.Discount_backend.controller;
 
-import com.discount_backend.Discount_backend.dto.UserProfileDto;
+import com.discount_backend.Discount_backend.dto.UserProfile.UserProfileDto;
 import com.discount_backend.Discount_backend.entity.objectfiles.ObjectType;
 import com.discount_backend.Discount_backend.service.ImageService;
 import com.discount_backend.Discount_backend.service.user.UserProfileService;

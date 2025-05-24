@@ -1,6 +1,6 @@
 package com.discount_backend.Discount_backend.service.user;
 
-import com.discount_backend.Discount_backend.dto.UserProfileDto;
+import com.discount_backend.Discount_backend.dto.UserProfile.UserProfileDto;
 import com.discount_backend.Discount_backend.entity.objectfiles.ObjectType;
 import com.discount_backend.Discount_backend.entity.user.User;
 import com.discount_backend.Discount_backend.entity.user.UserProfile;
@@ -35,19 +35,19 @@ public class UserProfileService {
 
         UserProfile profile = Optional.ofNullable(user.getProfile())
                 .orElseGet(() -> {
-                    UserProfile p = new UserProfile();
-                    p.setUser(user);
+                    UserProfile p = new UserProfile(user); // link user to new profile
                     return p;
                 });
 
         UserProfileDto dto = toDto(profile);
 
-        // **override** with the Cloudinary URL from object_file
+        // Override avatar URL from image service
         String avatarUrl = imageService.getActiveImageUrl(ObjectType.USER, user.getId());
         dto.setAvatarUrl(avatarUrl);
 
         return dto;
     }
+
 
     @Transactional
     public UserProfileDto updateMyProfile(String username, UserProfileDto dto) {
