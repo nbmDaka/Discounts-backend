@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -85,6 +86,13 @@ public class UserProfileService {
         out.setEmail(p.getEmail());
         out.setPhoneNumber(p.getPhoneNumber());
         // out.setAvatarUrl(p.getAvatarUrl());  // removed
+
+        List<String> roleNames = p.getUser()
+                .getUserRoles()
+                .stream()
+                .map(userRole -> userRole.getRole().getName())
+                .toList();
+        out.setRoles(roleNames);
         return out;
     }
 }
