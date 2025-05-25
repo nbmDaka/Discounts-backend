@@ -13,6 +13,7 @@ import com.discount_backend.Discount_backend.repository.discountRepository.Disco
 import com.discount_backend.Discount_backend.repository.marketRepository.MarketRepository;
 import jakarta.persistence.criteria.Expression;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -152,5 +153,12 @@ public class DiscountService {
 
     public void delete(Long id) {
         repo.deleteById(id);
+    }
+
+    @Scheduled(cron = "0 0 2 * * *") // every day at 02:00 AM
+    public void deleteExpiredDiscounts() {
+        LocalDate today = LocalDate.now();
+        int deletedCount = repo.deleteByEndDateBefore(today);
+        System.out.println("[SCHEDULED] Deleted expired discounts: " + deletedCount);
     }
 }
