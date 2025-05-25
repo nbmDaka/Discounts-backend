@@ -18,9 +18,9 @@ public class UserRole {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Getter
     @ManyToOne(optional = false)
     @JoinColumn(name = "role_id")
     private Role role;
 
-    // getters & setters
 }
