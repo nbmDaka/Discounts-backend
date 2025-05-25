@@ -1,5 +1,7 @@
 package com.discount_backend.Discount_backend.service;
 
+import com.discount_backend.Discount_backend.dto.discount.DiscountDto;
+import com.discount_backend.Discount_backend.dto.discount.DiscountMapper;
 import com.discount_backend.Discount_backend.entity.discount.LovedDiscount;
 import com.discount_backend.Discount_backend.repository.discountRepository.DiscountRepository;
 import com.discount_backend.Discount_backend.repository.discountRepository.LovedDiscountRepository;
@@ -32,10 +34,15 @@ public class LovedDiscountService {
         // otherwise no-op (idempotent)
     }
 
-    public List<Long> getLovedDiscountIds(Long userId) {
-        return lovedRepo.findByUserId(userId)
+    public List<DiscountDto> getLovedDiscounts(Long userId) {
+        List<Long> discountIds = lovedRepo.findByUserId(userId)
                 .stream()
                 .map(LovedDiscount::getDiscountId)
+                .toList();
+
+        return discountRepo.findAllById(discountIds)
+                .stream()
+                .map(DiscountMapper::toDto)
                 .toList();
     }
 

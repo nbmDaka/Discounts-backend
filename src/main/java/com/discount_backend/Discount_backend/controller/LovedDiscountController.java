@@ -1,5 +1,6 @@
 package com.discount_backend.Discount_backend.controller;
 
+import com.discount_backend.Discount_backend.dto.discount.DiscountDto;
 import com.discount_backend.Discount_backend.model.user.CustomUserDetails;
 import com.discount_backend.Discount_backend.service.LovedDiscountService;
 import org.springframework.http.HttpStatus;
@@ -28,15 +29,15 @@ public class LovedDiscountController {
     }
 
     @GetMapping("/loved")
-    public List<Long> getLovedDiscounts(
+    public List<DiscountDto> getLovedDiscounts(
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
-        return service.getLovedDiscountIds(currentUser.getId());
+        return service.getLovedDiscounts(currentUser.getId());
     }
 
     @DeleteMapping("/{discountId}/love")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void unloveDiscount(
+    public void unlovedDiscount(
             @PathVariable Long discountId,
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
