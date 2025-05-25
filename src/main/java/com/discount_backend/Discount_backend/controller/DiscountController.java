@@ -28,10 +28,14 @@ public class DiscountController {
     @GetMapping
     public List<DiscountDto> all(
             @RequestParam Optional<Long> category,
-            @RequestParam Optional<Boolean> premium
+            @RequestParam Optional<Boolean> premium,
+            @RequestParam Optional<Long> market,
+            @RequestParam Optional<Integer> minPercent,
+            @RequestParam Optional<String> startDate // use ISO format: yyyy-MM-dd
     ) {
-        return service.getAll(category, premium);
+        return service.getAll(category, premium, market, minPercent, startDate);
     }
+
 
     @GetMapping("/{id}")
     public DiscountDto one(@PathVariable Long id) {
