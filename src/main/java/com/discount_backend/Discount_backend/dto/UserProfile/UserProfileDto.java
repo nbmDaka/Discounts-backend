@@ -18,6 +18,8 @@ public class UserProfileDto {
     private String phoneNumber;
     private String avatarUrl;
     private List<String> roles;
+    private Long cityId;
+    private String cityName;
 
 
 }

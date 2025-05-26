@@ -1,5 +1,6 @@
 package com.discount_backend.Discount_backend.entity.user;
 
+import com.discount_backend.Discount_backend.entity.City;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +43,9 @@ public class UserProfile {
     @Column(name = "updated_at")
     private Instant updatedAt = Instant.now();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id")
+    private City city;
 
     public UserProfile() {}
 

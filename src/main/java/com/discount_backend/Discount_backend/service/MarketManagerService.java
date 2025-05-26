@@ -31,7 +31,7 @@ public class MarketManagerService {
     private final UserRoleRepository userRoleRepository;
 
     public List<UserProfileDto> getAllUsers() {
-        return userRepository.findAllWithRolesAndProfile()
+        return userRepository.findAllWithRolesAndProfileAndCity()
                 .stream()
                 .map(user -> {
                     UserProfile profile = user.getProfile();
@@ -39,13 +39,23 @@ public class MarketManagerService {
                             .map(userRole -> userRole.getRole().getName())
                             .toList();
 
+                    Long cityId = profile.getCity() != null
+                            ? profile.getCity().getId()
+                            : null;
+                    String cityName = profile.getCity() != null
+                            ? profile.getCity().getName()
+                            : null;
+
+
                     return new UserProfileDto(
                             profile.getFirstName(),
                             profile.getLastName(),
                             profile.getEmail(),
                             profile.getPhoneNumber(),
                             profile.getAvatarUrl(),
-                            roles
+                            roles,
+                            cityId,
+                            cityName
 
                     );
                 })
