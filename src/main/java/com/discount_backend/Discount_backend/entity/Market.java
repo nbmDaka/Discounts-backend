@@ -43,6 +43,11 @@ public class Market {
     @Column(name = "updated_at")
     private Instant updatedAt = Instant.now();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id")
+    private City city;
+
+
     @PreUpdate
     public void preUpdate() { updatedAt = Instant.now(); }
 

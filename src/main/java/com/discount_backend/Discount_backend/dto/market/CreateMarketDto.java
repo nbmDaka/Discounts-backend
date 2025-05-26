@@ -30,6 +30,8 @@ public class CreateMarketDto {
 
     @Size(max = 500)
     private String imageUrl;
+
+    private Long cityId;
     // getters & setters
 
 

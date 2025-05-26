@@ -16,6 +16,11 @@ public class MarketMapper {
         dto.setImageUrl(m.getImageUrl());
         dto.setCreatedAt(m.getCreatedAt());
         dto.setUpdatedAt(m.getUpdatedAt());
+        if (m.getCity() != null) {
+            dto.setCityId(m.getCity().getId());
+            dto.setCityName(m.getCity().getName());
+        }
+
         return dto;
     }
 

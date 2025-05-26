@@ -19,6 +19,9 @@ public class MarketDto {
     private Instant createdAt;
     private Instant updatedAt;
     private String  imageUrl;
+
+    private Long cityId;
+    private String cityName;
     // getters & setters
 
 
