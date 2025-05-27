@@ -19,4 +19,8 @@ public class ResourceNotFoundException extends RuntimeException {
         super(String.format("%s not found for attribute %s",
                 entityName, idAttribute.getName()));
     }
+
+    public ResourceNotFoundException(String s, String userRole) {
+        super(String.format("%s not found with role %d", s, userRole));
+    }
 }

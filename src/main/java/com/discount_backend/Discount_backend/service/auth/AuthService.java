@@ -23,6 +23,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.mail.MailException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.Instant;
 import java.util.List;
@@ -40,6 +44,7 @@ public class AuthService {
     private final JavaMailSender mailSender;
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class); // <-- ADDED THIS LINE!
 
     @Autowired
     public AuthService(UserRepository userRepo,
@@ -60,44 +65,106 @@ public class AuthService {
 
     @Transactional
     public void register(SignupRequest req) {
+        // --- 1. Check for existing username ---
         if (userRepo.existsByUsername(req.getUsername())) {
+            logger.warn("Registration attempt failed: Username '{}' already taken.", req.getUsername());
             throw new UserAlreadyExistsException("Username already taken");
         }
+
+        User user = new User();
+        user.setUsername(req.getUsername());
+        user.setPassword(pwEncoder.encode(req.getPassword()));
+
+        // --- 2. Handle UserProfile setup (Potential NullPointerException) ---
+        // Ensure user.getProfile() is not null. If it is, you need to initialize it.
+        // If UserProfile is lazily loaded or not automatically set, you MUST initialize it here.
+        // For example, if User.profile is @OneToOne and LAZY, it might be null initially.
+        // A common pattern is:
+        if (user.getProfile() == null) {
+            user.setProfile(new UserProfile()); // Initialize UserProfile if it's not done in User constructor
+        }
+        UserProfile profile = user.getProfile(); // Now 'profile' should not be null
+
+        // Defensive check (optional, but good if unsure about UserProfile initialization):
+        if (profile == null) {
+            logger.error("Registration failed for username '{}': UserProfile is still null after initialization attempt. Please review User entity and its UserProfile association.", req.getUsername());
+            throw new RuntimeException("Internal server error: User profile not initialized.");
+        }
+
+        profile.setFirstName(req.getFirstName());
+        profile.setLastName(req.getLastName());
+        // --- 3. Critical: Ensure email is a valid email address ---
+        // Assuming req.getUsername() *is* the email. If not, add a req.getEmail() field to SignupRequest
+        profile.setEmail(req.getUsername()); // Assuming username is email. If SignupRequest has email field, use req.getEmail() here.
+
         try {
-            User user = new User();
-            user.setUsername(req.getUsername());
-            user.setPassword(pwEncoder.encode(req.getPassword()));
-
-            UserProfile profile = user.getProfile();
-            profile.setFirstName(req.getFirstName());
-            profile.setLastName(req.getLastName());
-            user.getProfile().setEmail(req.getUsername());
             userRepo.save(user);
+            logger.info("User '{}' saved to database.", req.getUsername());
+        } catch (DataIntegrityViolationException e) {
+            logger.error("Database integrity violation during user save for '{}': {}", req.getUsername(), e.getMessage(), e);
+            throw new RuntimeException("Failed to save user due to database constraint violation. Please check unique fields.", e);
+        } catch (Exception e) {
+            logger.error("Unexpected error saving user '{}' to database: {}", req.getUsername(), e.getMessage(), e);
+            throw new RuntimeException("Failed to save user due to unexpected database error.", e);
+        }
 
-            // assign default ROLE_USER
+        // --- 4. Assign default ROLE_USER ---
+        try {
             Role role = roleRepo.findByName("user")
-                    .orElseThrow(() -> new ResourceNotFoundException("Default role not found", id));
+                    .orElseThrow(() -> new ResourceNotFoundException("Default role 'user' not found. Please ensure it exists in the database.", "user_role"));
+            // ^^^ CHANGED THIS LINE to match your ResourceNotFoundException constructor
+            // If it expects a Long ID, you might need to pass 0L or null (e.g., , null) or ( , 0L)
+
             UserRole ur = new UserRole();
             ur.setUser(user);
             ur.setRole(role);
             user.getUserRoles().add(ur);
-
-            // create & send verification token
-            String token = UUID.randomUUID().toString();
-            VerificationToken vToken = new VerificationToken();
-            vToken.setToken(token);
-            vToken.setUser(user);
-            vToken.setExpiryDate(Instant.now().plusSeconds(86400));
-            tokenRepo.save(vToken);
-
-            SimpleMailMessage mail = new SimpleMailMessage();
-            mail.setTo(user.getUsername());
-            mail.setSubject("Please activate your account");
-            mail.setText("Click to verify: http://localhost:3000/api/auth/verify?token=" + token);
-            mailSender.send(mail);
+            // Note: You might need to save user or userRole separately if not cascading properly
+            userRepo.save(user); // If userRoles are cascaded from User, this will save the UserRole. If not, you need userRoleRepo.save(ur);
+            logger.info("Assigned 'user' role to user '{}'.", req.getUsername());
+        } catch (ResourceNotFoundException e) {
+            logger.error("Role assignment failed for '{}': {}", req.getUsername(), e.getMessage(), e);
+            throw e; // Re-throw the specific exception
         } catch (Exception e) {
-            throw new RuntimeException("Error during registration process");
+            logger.error("Unexpected error during role assignment for '{}': {}", req.getUsername(), e.getMessage(), e);
+            throw new RuntimeException("Failed to assign default role.", e);
         }
+
+        // --- 5. Create & save verification token ---
+        String token = UUID.randomUUID().toString();
+        VerificationToken vToken = new VerificationToken();
+        vToken.setToken(token);
+        vToken.setUser(user);
+        vToken.setExpiryDate(Instant.now().plusSeconds(86400));
+        try {
+            tokenRepo.save(vToken);
+            logger.info("Verification token generated and saved for user '{}'.", req.getUsername());
+        } catch (Exception e) {
+            logger.error("Failed to save verification token for user '{}': {}", req.getUsername(), e.getMessage(), e);
+            throw new RuntimeException("Error saving verification token.", e);
+        }
+
+
+        // --- 6. Send verification email ---
+        try {
+            SimpleMailMessage mail = new SimpleMailMessage();
+            // IMPORTANT: mail.setTo must be a valid email address.
+            // If req.getUsername() is not a valid email, this will fail.
+            // Consider having an 'email' field in SignupRequest if username is separate.
+            mail.setTo(user.getProfile().getEmail()); // Using email from profile, which should be valid
+            mail.setSubject("Please activate your account");
+            mail.setText("Click to verify: http://209.97.172.192:3000/api/auth/verify?token=" + token);
+            mailSender.send(mail);
+            logger.info("Verification email sent to '{}'.", user.getProfile().getEmail());
+        } catch (MailException e) { // Catch specific MailException
+            logger.error("Failed to send verification email to '{}': {}", user.getProfile().getEmail(), e.getMessage(), e);
+            throw new RuntimeException("Error sending verification email. Please check mail configuration and recipient address.", e);
+        } catch (Exception e) {
+            logger.error("An unexpected error occurred while sending email to '{}': {}", user.getProfile().getEmail(), e.getMessage(), e);
+            throw new RuntimeException("An unexpected error occurred during email sending.", e);
+        }
+
+        logger.info("User '{}' registered successfully.", req.getUsername());
     }
 
     @Transactional
