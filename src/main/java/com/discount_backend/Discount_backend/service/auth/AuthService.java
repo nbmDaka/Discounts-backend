@@ -13,6 +13,7 @@ import com.discount_backend.Discount_backend.exception.UserAlreadyExistsExceptio
 import com.discount_backend.Discount_backend.repository.user.UserRepository;
 import com.discount_backend.Discount_backend.repository.auth.VerificationTokenRepository;
 import com.discount_backend.Discount_backend.repository.role.RoleRepository;
+import com.discount_backend.Discount_backend.service.sendGrid.SendGridService;
 import com.discount_backend.Discount_backend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -44,7 +45,8 @@ public class AuthService {
     private final JavaMailSender mailSender;
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
-    private static final Logger logger = LoggerFactory.getLogger(AuthService.class); // <-- ADDED THIS LINE!
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+    private final SendGridService sendGridService;
 
     @Autowired
     public AuthService(UserRepository userRepo,
@@ -53,7 +55,8 @@ public class AuthService {
                        PasswordEncoder pwEncoder,
                        JavaMailSender mailSender,
                        AuthenticationManager authManager,
-                       JwtUtil jwtUtil) {
+                       JwtUtil jwtUtil,
+                        SendGridService sendGridService) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.tokenRepo = tokenRepo;
@@ -61,6 +64,7 @@ public class AuthService {
         this.mailSender = mailSender;
         this.authManager = authManager;
         this.jwtUtil = jwtUtil;
+        this.sendGridService = sendGridService;
     }
 
     @Transactional
@@ -147,14 +151,18 @@ public class AuthService {
 
         // --- 6. Send verification email ---
         try {
-            SimpleMailMessage mail = new SimpleMailMessage();
-            // IMPORTANT: mail.setTo must be a valid email address.
-            // If req.getUsername() is not a valid email, this will fail.
-            // Consider having an 'email' field in SignupRequest if username is separate.
-            mail.setTo(user.getProfile().getEmail()); // Using email from profile, which should be valid
-            mail.setSubject("Please activate your account");
-            mail.setText("Click to verify: http://209.97.172.192:3000/api/auth/verify?token=" + token);
-            mailSender.send(mail);
+            try {
+                String email = user.getProfile().getEmail();
+                String subject = "Please activate your account";
+                String verificationUrl = "http://209.97.172.192:3000/api/auth/verify?token=" + token;
+                String body = "Click to verify your account: " + verificationUrl;
+
+                sendGridService.sendEmail(email, subject, body);
+                logger.info("Verification email sent to '{}'.", email);
+            } catch (Exception e) {
+                logger.error("Failed to send verification email to '{}': {}", user.getProfile().getEmail(), e.getMessage(), e);
+                throw new RuntimeException("Error sending verification email. Please check SendGrid configuration.", e);
+            }
             logger.info("Verification email sent to '{}'.", user.getProfile().getEmail());
         } catch (MailException e) { // Catch specific MailException
             logger.error("Failed to send verification email to '{}': {}", user.getProfile().getEmail(), e.getMessage(), e);
