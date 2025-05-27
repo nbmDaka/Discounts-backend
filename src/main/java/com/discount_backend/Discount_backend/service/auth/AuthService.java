@@ -14,6 +14,7 @@ import com.discount_backend.Discount_backend.repository.user.UserRepository;
 import com.discount_backend.Discount_backend.repository.auth.VerificationTokenRepository;
 import com.discount_backend.Discount_backend.repository.role.RoleRepository;
 import com.discount_backend.Discount_backend.service.mailJet.MailjetService;
+import com.discount_backend.Discount_backend.service.sendGrid.SendGridService;
 import com.discount_backend.Discount_backend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,6 +44,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
     private final MailjetService mailjetService;
+    private final SendGridService sendGridService;
 
 
     @Autowired
@@ -52,7 +54,8 @@ public class AuthService {
                        PasswordEncoder pwEncoder,
                        AuthenticationManager authManager,
                        JwtUtil jwtUtil,
-                       MailjetService mailjetService) {
+                       MailjetService mailjetService,
+                       SendGridService sendGridService) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.tokenRepo = tokenRepo;
@@ -60,6 +63,7 @@ public class AuthService {
         this.authManager = authManager;
         this.jwtUtil = jwtUtil;
         this.mailjetService = mailjetService;
+        this.sendGridService = sendGridService;
     }
 
     @Transactional
@@ -135,7 +139,7 @@ public class AuthService {
             String htmlBody = "<p>Click the link below to verify your account:</p>"
                     + "<p><a href=\"" + verificationUrl + "\">Verify Account</a></p>";
 
-            mailjetService.sendVerificationEmail(email, subject, htmlBody);
+            sendGridService.sendVerificationEmail(email, subject, htmlBody);
             logger.info("Verification email sent to '{}'.", email);
         } catch (Exception e) {
             logger.error("Mailjet error sending to '{}': {}", user.getProfile().getEmail(), e.getMessage(), e);
