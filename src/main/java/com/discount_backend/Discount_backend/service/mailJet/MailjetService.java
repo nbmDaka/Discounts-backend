@@ -11,10 +11,10 @@ import java.util.Map;
 @Service
 public class MailjetService {
 
-    @Value("${mailjet.api.key}")
+    @Value("${mailjet.api-key}")
     private String apiKey;
 
-    @Value("${mailjet.secret.key}")
+    @Value("${mailjet.secret-key}")
     private String secretKey;
 
     @Value("${mailjet.from.email}")
