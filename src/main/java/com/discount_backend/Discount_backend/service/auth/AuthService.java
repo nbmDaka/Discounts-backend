@@ -13,8 +13,7 @@ import com.discount_backend.Discount_backend.exception.UserAlreadyExistsExceptio
 import com.discount_backend.Discount_backend.repository.user.UserRepository;
 import com.discount_backend.Discount_backend.repository.auth.VerificationTokenRepository;
 import com.discount_backend.Discount_backend.repository.role.RoleRepository;
-import com.discount_backend.Discount_backend.service.mailJet.MailjetService;
-import com.discount_backend.Discount_backend.service.sendGrid.SendGridService;
+import com.discount_backend.Discount_backend.service.mailSender.MailSenderService;
 import com.discount_backend.Discount_backend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,8 +42,7 @@ public class AuthService {
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
-    private final MailjetService mailjetService;
-    private final SendGridService sendGridService;
+    private final MailSenderService emailService;
 
 
     @Autowired
@@ -54,16 +52,14 @@ public class AuthService {
                        PasswordEncoder pwEncoder,
                        AuthenticationManager authManager,
                        JwtUtil jwtUtil,
-                       MailjetService mailjetService,
-                       SendGridService sendGridService) {
+                        MailSenderService emailService) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.tokenRepo = tokenRepo;
         this.pwEncoder = pwEncoder;
         this.authManager = authManager;
         this.jwtUtil = jwtUtil;
-        this.mailjetService = mailjetService;
-        this.sendGridService = sendGridService;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -135,13 +131,15 @@ public class AuthService {
         try {
             String email = user.getProfile().getEmail();
             String subject = "Please activate your account";
-            String verificationUrl = "http://209.97.172.192:3000/api/auth/verify?token=" + token;
+            String verificationUrl =
+                    "http://209.97.172.192:3000/api/auth/verify?token=" + token;
             String textBody =
-                    "Please activate your account by visiting:\n\n"
-                            + verificationUrl
-                            + "\n\nThanks for signing up!";
-            mailjetService.sendVerificationEmail(email, subject, textBody);
+                    "Hello " + profile.getFirstName() + ",\n\n" +
+                            "Please activate your account by visiting the link:\n" +
+                            verificationUrl + "\n\n" +
+                            "Thank you!";
 
+            emailService.sendVerificationEmail(email, subject, textBody);
             logger.info("Verification email sent to '{}'.", email);
         } catch (Exception e) {
             logger.error("Mailjet error sending to '{}': {}", user.getProfile().getEmail(), e.getMessage(), e);
