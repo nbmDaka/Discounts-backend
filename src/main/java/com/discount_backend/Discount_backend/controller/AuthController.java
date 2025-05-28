@@ -42,19 +42,21 @@ public class AuthController {
         // Create Secure, HttpOnly cookies
         ResponseCookie accessCookie = ResponseCookie.from("access_token", tokens.getAccessToken())
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
+                .sameSite("Lax")
                 .path("/")
                 .maxAge(15 * 60)
-                .sameSite("Strict")
                 .build();
+
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", tokens.getRefreshToken())
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
+                .sameSite("Lax")
                 .path("/")
                 .maxAge(30 * 24 * 60 * 60)
-                .sameSite("Strict")
                 .build();
+
 
         response.addHeader("Set-Cookie", accessCookie.toString());
         response.addHeader("Set-Cookie", refreshCookie.toString());
@@ -71,9 +73,19 @@ public class AuthController {
 
         // Overwrite cookies
         ResponseCookie accessCookie = ResponseCookie.from("access_token", tokens.getAccessToken())
-                .httpOnly(true).secure(true).path("/").maxAge(15 * 60).sameSite("Strict").build();
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(15 * 60)
+                .build();
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", tokens.getRefreshToken())
-                .httpOnly(true).secure(true).path("/").maxAge(30 * 24 * 60 * 60).sameSite("Strict").build();
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(30 * 24 * 60 * 60)
+                .build();
 
         response.addHeader("Set-Cookie", accessCookie.toString());
         response.addHeader("Set-Cookie", refreshCookie.toString());
@@ -86,19 +98,19 @@ public class AuthController {
         // Clear access_token cookie
         ResponseCookie clearAccessCookie = ResponseCookie.from("access_token", "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .path("/")
                 .maxAge(0) // Immediately expire
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
 
         // Clear refresh_token cookie
         ResponseCookie clearRefreshCookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
 
         response.addHeader("Set-Cookie", clearAccessCookie.toString());
