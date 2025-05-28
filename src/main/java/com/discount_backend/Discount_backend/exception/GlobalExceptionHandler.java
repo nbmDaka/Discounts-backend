@@ -133,7 +133,7 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
-                "An unexpected error occurred",
+                ex.getMessage(),
                 req.getRequestURI()
         );
         // you can log ex here
