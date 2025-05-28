@@ -132,7 +132,7 @@ public class AuthService {
             String email = user.getProfile().getEmail();
             String subject = "Please activate your account";
             String verificationUrl =
-                    "http://209.97.172.192:3000/api/auth/verify?token=" + token;
+                    "http://5.223.52.23:3000/api/auth/verify?token=" + token;
             String textBody =
                     "Hello " + profile.getFirstName() + ",\n\n" +
                             "Please activate your account by visiting the link:\n" +
