@@ -16,6 +16,7 @@ import com.discount_backend.Discount_backend.repository.role.RoleRepository;
 import com.discount_backend.Discount_backend.service.mailSender.MailSenderService;
 import com.discount_backend.Discount_backend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
@@ -167,7 +169,10 @@ public class AuthService {
         try {
             authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (AuthenticationException e) {
-            throw new org.springframework.security.core.AuthenticationException("Invalid username or password") {};
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid username or password"
+            );
         }
         User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found", id));
@@ -181,8 +186,18 @@ public class AuthService {
     }
 
     public AuthResponse refreshToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Missing refresh token"
+            );
+        }
+
         if (!jwtUtil.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("Invalid refresh token");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid refresh token"
+            );
         }
         String username = jwtUtil.getUsername(refreshToken);
         // bypass authenticationManager here since we already trust the refresh token
