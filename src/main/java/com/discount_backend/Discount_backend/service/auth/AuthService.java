@@ -136,10 +136,12 @@ public class AuthService {
             String email = user.getProfile().getEmail();
             String subject = "Please activate your account";
             String verificationUrl = "http://209.97.172.192:3000/api/auth/verify?token=" + token;
-            String htmlBody = "<p>Click the link below to verify your account:</p>"
-                    + "<p><a href=\"" + verificationUrl + "\">Verify Account</a></p>";
+            String textBody =
+                    "Please activate your account by visiting:\n\n"
+                            + verificationUrl
+                            + "\n\nThanks for signing up!";
+            mailjetService.sendVerificationEmail(email, subject, textBody);
 
-            sendGridService.sendVerificationEmail(email, subject, htmlBody);
             logger.info("Verification email sent to '{}'.", email);
         } catch (Exception e) {
             logger.error("Mailjet error sending to '{}': {}", user.getProfile().getEmail(), e.getMessage(), e);

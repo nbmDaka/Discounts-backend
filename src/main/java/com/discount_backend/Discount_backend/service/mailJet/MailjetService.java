@@ -11,16 +11,16 @@ import java.util.Map;
 @Service
 public class MailjetService {
 
-    @Value("${mailjet.apiKey}")
+    @Value("${spring.mailjet.apiKey}")
     private String apiKey;
 
-    @Value("${mailjet.secretKey}")
+    @Value("${spring.mailjet.secretKey}")
     private String secretKey;
 
-    @Value("${mailjet.from.email}")
+    @Value("${spring.mailjet.from.email}")
     private String fromEmail;
 
-    @Value("${mailjet.from.name}")
+    @Value("${spring.mailjet.from.name}")
     private String fromName;
 
     public void sendVerificationEmail(String toEmail, String subject, String htmlBody) {
@@ -39,7 +39,7 @@ public class MailjetService {
         message.put("From", Map.of("Email", fromEmail, "Name", fromName));
         message.put("To", new Map[]{Map.of("Email", toEmail)});
         message.put("Subject", subject);
-        message.put("HTMLPart", htmlBody);
+        message.put("TextPart", htmlBody);
 
         Map<String, Object> body = Map.of("Messages", new Map[]{message});
 

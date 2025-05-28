@@ -18,10 +18,10 @@ public class SendGridService {
     @Value("${sendgrid.from.email}")
     private String fromEmail;
 
-    public void sendVerificationEmail(String toEmail, String subject, String htmlContent) {
+    public void sendVerificationEmail(String toEmail, String subject, String body) {
         Email from = new Email(fromEmail);
         Email to = new Email(toEmail);
-        Content content = new Content("text/html", htmlContent);
+        Content content = new Content("text/plain", body);
         Mail mail = new Mail(from, subject, to, content);
 
         SendGrid sg = new SendGrid(sendGridApiKey);
