@@ -7,9 +7,11 @@ import com.discount_backend.Discount_backend.dto.auth.SignupRequest;
 import com.discount_backend.Discount_backend.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,64 +35,21 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(
-            @Valid @RequestBody LoginRequest req,
-            HttpServletResponse response
-    ) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest req) {
         AuthResponse tokens = authService.authenticate(req.getUsername(), req.getPassword());
-
-        // Create Secure, HttpOnly cookies
-        ResponseCookie accessCookie = ResponseCookie.from("access_token", tokens.getAccessToken())
-                .httpOnly(true)
-                .secure(false)
-                .sameSite("Lax")
-                .path("/")
-                .maxAge(15 * 60)
-                .build();
-
-
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", tokens.getRefreshToken())
-                .httpOnly(true)
-                .secure(false)
-                .sameSite("Lax")
-                .path("/")
-                .maxAge(30 * 24 * 60 * 60)
-                .build();
-
-
-        response.addHeader("Set-Cookie", accessCookie.toString());
-        response.addHeader("Set-Cookie", refreshCookie.toString());
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(tokens);
     }
 
+
     @PostMapping("/refresh-token")
-    public ResponseEntity<Void> refresh(
-            @CookieValue(name = "refresh_token", required = false) String refreshToken,
-            HttpServletResponse response
-    ) {
+    public ResponseEntity<AuthResponse> refresh(@RequestHeader("Authorization") String authHeader) {
+        // Expect header: "Bearer <refreshToken>"
+        if (!authHeader.startsWith("Bearer ")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Authorization header");
+        }
+        String refreshToken = authHeader.substring(7);
         AuthResponse tokens = authService.refreshToken(refreshToken);
-
-        // Overwrite cookies
-        ResponseCookie accessCookie = ResponseCookie.from("access_token", tokens.getAccessToken())
-                .httpOnly(true)
-                .secure(false)
-                .sameSite("Lax")
-                .path("/")
-                .maxAge(15 * 60)
-                .build();
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", tokens.getRefreshToken())
-                .httpOnly(true)
-                .secure(false)
-                .sameSite("Lax")
-                .path("/")
-                .maxAge(30 * 24 * 60 * 60)
-                .build();
-
-        response.addHeader("Set-Cookie", accessCookie.toString());
-        response.addHeader("Set-Cookie", refreshCookie.toString());
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(tokens);
     }
 
     @PostMapping("/logout")
