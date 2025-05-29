@@ -19,7 +19,7 @@ public class MarketManagerController {
     private final MarketManagerService service;
 
     @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<List<UserProfileDto>> getUsers() {
         return ResponseEntity.ok(service.getAllUsers());
     }

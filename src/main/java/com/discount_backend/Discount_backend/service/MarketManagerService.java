@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +35,12 @@ public class MarketManagerService {
         return userRepository.findAllWithRolesAndProfileAndCity()
                 .stream()
                 .map(user -> {
-                    UserProfile profile = user.getProfile();
+                    // if there’s no existing profile, use an “empty” one
+                    UserProfile profile = Optional.ofNullable(user.getProfile())
+                            .orElseGet(() -> new UserProfile(user));
+
                     List<String> roles = user.getUserRoles().stream()
-                            .map(userRole -> userRole.getRole().getName())
+                            .map(ur -> ur.getRole().getName())
                             .toList();
 
                     Long cityId = profile.getCity() != null
@@ -46,8 +50,13 @@ public class MarketManagerService {
                             ? profile.getCity().getName()
                             : null;
 
+                    Long marketId = marketManagerRepository
+                            .findByUserId(user.getId())
+                            .map(mm -> mm.getMarket().getId())
+                            .orElse(null);
 
                     return new UserProfileDto(
+                            profile.getId(),
                             profile.getFirstName(),
                             profile.getLastName(),
                             profile.getEmail(),
@@ -55,12 +64,13 @@ public class MarketManagerService {
                             profile.getAvatarUrl(),
                             roles,
                             cityId,
-                            cityName
-
+                            cityName,
+                            marketId
                     );
                 })
                 .toList();
     }
+
 
     @Transactional
     public void assignManager(Long marketId, Long userId) {
@@ -81,7 +91,7 @@ public class MarketManagerService {
 
         // Fetch MANAGER role from DB
         Role managerRole = roleRepository.findByName("manager")
-                .orElseThrow(() -> new RuntimeException("MANAGER role not found"));
+                .orElseThrow(() -> new RuntimeException("manager role not found"));
 
         if (!userRoleRepository.existsByUserIdAndRole(user.getId(), managerRole)) {
             UserRole userRole = new UserRole();

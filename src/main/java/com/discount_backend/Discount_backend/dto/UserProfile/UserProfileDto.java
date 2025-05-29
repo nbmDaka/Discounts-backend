@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserProfileDto {
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
@@ -20,6 +21,7 @@ public class UserProfileDto {
     private List<String> roles;
     private Long cityId;
     private String cityName;
+    private Long marketId;
 
 
 }

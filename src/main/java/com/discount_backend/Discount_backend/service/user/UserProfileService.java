@@ -92,6 +92,7 @@ public class UserProfileService {
 
     private UserProfileDto toDto(UserProfile p) {
         UserProfileDto out = new UserProfileDto();
+        out.setId(p.getId());
         out.setFirstName(p.getFirstName());
         out.setLastName(p.getLastName());
         out.setEmail(p.getEmail());
