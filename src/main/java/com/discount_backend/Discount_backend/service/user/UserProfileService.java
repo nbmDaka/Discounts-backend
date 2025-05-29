@@ -6,6 +6,7 @@ import com.discount_backend.Discount_backend.entity.objectfiles.ObjectType;
 import com.discount_backend.Discount_backend.entity.user.User;
 import com.discount_backend.Discount_backend.entity.user.UserProfile;
 import com.discount_backend.Discount_backend.repository.CityRepository;
+import com.discount_backend.Discount_backend.repository.marketRepository.MarketManagerRepository;
 import com.discount_backend.Discount_backend.repository.user.UserProfileRepository;
 import com.discount_backend.Discount_backend.repository.user.UserRepository;
 import com.discount_backend.Discount_backend.service.ImageService;
@@ -22,17 +23,20 @@ public class UserProfileService {
     private final UserProfileRepository profileRepo;
     private final ImageService imageService;
     private final CityRepository cityRepository;
+    private final MarketManagerRepository marketManagerRepository;
 
     public UserProfileService(
             UserRepository userRepo,
             UserProfileRepository profileRepo,
             ImageService imageService,
-            CityRepository cityRepository
+            CityRepository cityRepository,
+            MarketManagerRepository marketManagerRepository
     ) {
         this.userRepo     = userRepo;
         this.profileRepo  = profileRepo;
         this.imageService = imageService;
         this.cityRepository = cityRepository;
+        this.marketManagerRepository = marketManagerRepository;
     }
 
     public UserProfileDto getMyProfile(String username) {
@@ -50,6 +54,12 @@ public class UserProfileService {
         // Override avatar URL from image service
         String avatarUrl = imageService.getActiveImageUrl(ObjectType.USER, user.getId());
         dto.setAvatarUrl(avatarUrl);
+
+        Long marketId = marketManagerRepository
+                .findByUserId(user.getId())
+                .map(mm -> mm.getMarket().getId())
+                .orElse(null);
+        dto.setMarketId(marketId);
 
         return dto;
     }
