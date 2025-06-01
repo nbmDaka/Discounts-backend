@@ -2,11 +2,11 @@
   "Servers": {
     "1": {
       "Name": "Discounts PostgreSQL",
-      "Group": "Docker Databases",
-      "Host": "db",
+      "Group": "Host Databases",
+      "Host": "host.docker.internal",
       "Port": 5432,
       "MaintenanceDB": "discounts",
-      "Username": "postgres",
+      "Username": "discount_user",
       "Password": "123456",
       "SSLMode": "prefer",
       "SavePassword": true,

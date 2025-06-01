@@ -19,18 +19,18 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     restart: always
 
-  db:
-    image: postgres:16
-    container_name: discount-db
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: discounts
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+#  db:
+#    image: postgres:16
+#    container_name: discount-db
+#    restart: always
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: 123456
+#      POSTGRES_DB: discounts
+#    ports:
+#      - "5432:5432"
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
@@ -45,8 +45,8 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
       - ./pgadmin/servers.json:/pgadmin4/servers.json  # Auto-connect config
-    depends_on:
-      - db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   # backup:
   #   image: postgres:16
