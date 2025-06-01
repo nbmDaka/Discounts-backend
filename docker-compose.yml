@@ -17,6 +17,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: 123456
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: always
 
 #  db:
