@@ -59,7 +59,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(0) // Immediately expire
+                .maxAge(0)
                 .sameSite("Lax")
                 .build();
 
