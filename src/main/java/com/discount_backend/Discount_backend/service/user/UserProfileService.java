@@ -107,7 +107,6 @@ public class UserProfileService {
         out.setLastName(p.getLastName());
         out.setEmail(p.getEmail());
         out.setPhoneNumber(p.getPhoneNumber());
-        // out.setAvatarUrl(p.getAvatarUrl());  // removed
 
         List<String> roleNames = p.getUser()
                 .getUserRoles()
