@@ -63,7 +63,6 @@ public class AuthController {
                 .sameSite("Lax")
                 .build();
 
-        // Clear refresh_token cookie
         ResponseCookie clearRefreshCookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
                 .secure(false)
