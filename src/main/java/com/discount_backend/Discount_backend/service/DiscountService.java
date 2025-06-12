@@ -78,7 +78,6 @@ public class DiscountService {
                         cb.literal(100)
                 );
 
-                // Cast to Double for comparison
                 Expression<Double> discountPercent = discountRaw.as(Double.class);
 
                 return cb.greaterThanOrEqualTo(discountPercent, percent.doubleValue());
