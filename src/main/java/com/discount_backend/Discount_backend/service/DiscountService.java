@@ -41,7 +41,7 @@ public class DiscountService {
         this.categoryRepo = categoryRepo;
         this.imageService = imageService;
     }
-
+    // This method retrieves all discounts based on optional filters.
     public List<DiscountDto> getAll(
             Optional<Long> categoryId,
             Optional<Boolean> isPremium,
