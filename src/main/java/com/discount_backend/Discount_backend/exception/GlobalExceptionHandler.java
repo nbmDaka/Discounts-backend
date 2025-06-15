@@ -136,7 +136,6 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 req.getRequestURI()
         );
-        // you can log ex here
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }
