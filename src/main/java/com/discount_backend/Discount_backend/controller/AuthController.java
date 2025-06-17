@@ -54,7 +54,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
-        // Clear access_token cookie
         ResponseCookie clearAccessCookie = ResponseCookie.from("access_token", "")
                 .httpOnly(true)
                 .secure(false)
