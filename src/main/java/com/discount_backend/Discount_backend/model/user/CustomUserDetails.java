@@ -36,8 +36,6 @@ public class CustomUserDetails implements UserDetails {
                 .collect(Collectors.toList());
     }
 
-    // If you have no explicit “expired”/“locked” fields on User,
-    // just return true so authentication always treats them as valid:
 
     @Override
     public boolean isAccountNonExpired() {
