@@ -1,11 +1,9 @@
 package com.discount_backend.Discount_backend.exception;
 
 import jakarta.persistence.metamodel.SingularAttribute;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.io.Serializable;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class ResourceNotFoundException extends RuntimeException {
