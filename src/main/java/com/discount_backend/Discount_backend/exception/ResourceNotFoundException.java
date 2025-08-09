@@ -11,7 +11,6 @@ public class ResourceNotFoundException extends RuntimeException {
         super(String.format("%s not found with id %d", resourceName, id));
     }
 
-    // if you still need your existing constructor:
     public ResourceNotFoundException(String entityName,
                                      SingularAttribute<?, ?> idAttribute) {
         super(String.format("%s not found for attribute %s",
